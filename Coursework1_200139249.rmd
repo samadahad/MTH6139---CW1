@@ -1,0 +1,65 @@
+---
+title: "MTH6139 Time Series"
+subtitle: "Coursework 1"
+author:
+- name: Mohammed Ahad
+date: "March 2024"
+output:
+  html_document:
+    toc: true
+    toc_float: true
+---
+
+```{r, echo=FALSE}
+htmltools::img(src = knitr::image_uri("QMlogo.png"), 
+               alt = 'logo', 
+               style = 'position:absolute; top:0; right:0; padding:10px; width:30%;')
+```
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+The Data I will be using is from the ASTSA library and measures the Quarterly interest rate from 1953 to 1980. It is labelled qintr.
+
+### 2.
+```{r}
+library(astsa)
+qintr.dataframe = data.frame(ds=zoo::as.yearmon(time(qintr)), y=qintr)
+```
+The time series is setup as a data frame called "qintr.dataframe" where "ds" is the time vector and "y" is the data vector. "ds" will be the year and "y" will be the interest rate. 
+
+
+### 3.
+```{r}
+library(prophet)
+ModelwithnoSeasonality = prophet(qintr.dataframe)
+ModelwithSeasonality = prophet(qintr.dataframe , yearly.seasonality=TRUE)
+```
+I have used the prophet function to analyse the Quarterly interest rate and to create 2 models which use its knowledge of the 
+time series data to predict and forecast future values. One model Without seasonality and one model with.
+This is important because being able to accurately predict future interest rates could give an investor a major advantage in the financial markets. 
+
+### 4. 
+```{r}
+forecastwithnoSeasonality = make_future_dataframe(ModelwithnoSeasonality, periods=8, freq="quarter")
+forecastwithSeasonality = make_future_dataframe(ModelwithSeasonality, periods=8, freq="quarter")
+```
+I have created 2 different data frames with 8 future quarters for predictions
+
+
+### 5. 
+```{r}
+PredictionwithnoSeasonality =predict(ModelwithnoSeasonality,forecastwithnoSeasonality) 
+PredictionwithSeasonality = predict(ModelwithSeasonality,forecastwithSeasonality)
+```
+Using the earlier prophet model the function will make 8 quarterly predictions, one without seasonality and one with.
+
+
+### 6.
+```{r}
+plot(ModelwithnoSeasonality,PredictionwithnoSeasonality)
+plot(ModelwithSeasonality,PredictionwithSeasonality)
+```
+
+The shaded region represent the prediction interval and the black dots are the observed data point. Both graphs look very similar which shows that there is a minimal seasonal effect . As shown in both graphs the vast majority of the data points lie within the prediction region apart from a few outlier on the tail end. This shows that there is a high degree a accuracy with the meta prophet function.
